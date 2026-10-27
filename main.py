@@ -3,57 +3,71 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # ==========================================
-# 1. 원소 데이터베이스 구축 (1~118번)
+# 1. 원소 데이터베이스 구축 (1~118번 전체 한글화)
 # ==========================================
 @st.cache_data
 def load_element_data():
-    # 교과서 핵심 원소 30여 개 (원자번호, 기호, 한글이름, 환원전위, 비금속여부, 이론상여부, 주 산화수)
-    core_data = [
-        (1, 'H', '수소', 0.00, True, False, 1),
-        (3, 'Li', '리튬', -3.04, False, False, 1),
-        (4, 'Be', '베릴륨', -1.85, False, False, 2),
-        (6, 'C', '탄소', 0.20, True, False, 4), # 불활성 전극용 대표값
-        (7, 'N', '질소', -0.01, True, False, 3),
-        (8, 'O', '산소', 1.23, True, False, 2),
-        (9, 'F', '플루오린', 2.87, True, False, 1),
-        (11, 'Na', '나트륨', -2.71, False, False, 1),
-        (12, 'Mg', '마그네슘', -2.37, False, False, 2),
-        (13, 'Al', '알루미늄', -1.66, False, False, 3),
-        (17, 'Cl', '염소', 1.36, True, False, 1),
-        (19, 'K', '칼륨', -2.93, False, False, 1),
-        (20, 'Ca', '칼슘', -2.87, False, False, 2),
-        (24, 'Cr', '크로뮴', -0.74, False, False, 3),
-        (25, 'Mn', '망가니즈', -1.18, False, False, 2),
-        (26, 'Fe', '철', -0.44, False, False, 2),
-        (27, 'Co', '코발트', -0.28, False, False, 2),
-        (28, 'Ni', '니켈', -0.25, False, False, 2),
-        (29, 'Cu', '구리', 0.34, False, False, 2),
-        (30, 'Zn', '아연', -0.76, False, False, 2),
-        (35, 'Br', '브로민', 1.07, True, False, 1),
-        (47, 'Ag', '은', 0.80, False, False, 1),
-        (50, 'Sn', '주석', -0.14, False, False, 2),
-        (53, 'I', '아이오딘', 0.54, True, False, 1),
-        (56, 'Ba', '바륨', -2.91, False, False, 2),
-        (78, 'Pt', '백금', 1.18, False, False, 2),
-        (79, 'Au', '금', 1.50, False, False, 3),
-        (80, 'Hg', '수은', 0.85, False, False, 2),
-        (82, 'Pb', '납', -0.13, False, False, 2)
-    ]
-    
-    df = pd.DataFrame(core_data, columns=['원자번호', '기호', '한글이름', '표준환원전위', 'isNonMetal', 'isTheoretical', '산화수'])
-    
-    # 1~118번 중 없는 데이터는 임의/가상 데이터로 채우기
-    existing_nums = df['원자번호'].tolist()
-    missing_data = []
+    # 1~118번 원소 기호 및 한글 이름 전체 매핑
+    element_dict = {
+        1: ('H', '수소'), 2: ('He', '헬륨'), 3: ('Li', '리튬'), 4: ('Be', '베릴륨'), 5: ('B', '붕소'),
+        6: ('C', '탄소'), 7: ('N', '질소'), 8: ('O', '산소'), 9: ('F', '플루오린'), 10: ('Ne', '네온'),
+        11: ('Na', '나트륨'), 12: ('Mg', '마그네슘'), 13: ('Al', '알루미늄'), 14: ('Si', '규소'), 15: ('P', '인'),
+        16: ('S', '황'), 17: ('Cl', '염소'), 18: ('Ar', '아르곤'), 19: ('K', '칼륨'), 20: ('Ca', '칼슘'),
+        21: ('Sc', '스칸듐'), 22: ('Ti', '타이타늄'), 23: ('V', '바나듐'), 24: ('Cr', '크로뮴'), 25: ('Mn', '망가니즈'),
+        26: ('Fe', '철'), 27: ('Co', '코발트'), 28: ('Ni', '니켈'), 29: ('Cu', '구리'), 30: ('Zn', '아연'),
+        31: ('Ga', '갈륨'), 32: ('Ge', '저마늄'), 33: ('As', '비소'), 34: ('Se', '셀레늄'), 35: ('Br', '브로민'),
+        36: ('Kr', '크립톤'), 37: ('Rb', '루비듐'), 38: ('Sr', '스트론튬'), 39: ('Y', '이트륨'), 40: ('Zr', '지르코늄'),
+        41: ('Nb', '나이오븀'), 42: ('Mo', '몰리브데넘'), 43: ('Tc', '테크네튬'), 44: ('Ru', '루테늄'), 45: ('Rh', '로듐'),
+        46: ('Pd', '팔라듐'), 47: ('Ag', '은'), 48: ('Cd', '카드뮴'), 49: ('In', '인듐'), 50: ('Sn', '주석'),
+        51: ('Sb', '안티모니'), 52: ('Te', '텔루륨'), 53: ('I', '아이오딘'), 54: ('Xe', '제논'), 55: ('Cs', '세슘'),
+        56: ('Ba', '바륨'), 57: ('La', '란타넘'), 58: ('Ce', '세륨'), 59: ('Pr', '프라세오디뮴'), 60: ('Nd', '네오디뮴'),
+        61: ('Pm', '프로메튬'), 62: ('Sm', '사마륨'), 63: ('Eu', '유로퓸'), 64: ('Gd', '가돌리늄'), 65: ('Tb', '터븀'),
+        66: ('Dy', '디스프로슘'), 67: ('Ho', '홀뮴'), 68: ('Er', '어븀'), 69: ('Tm', '툴륨'), 70: ('Yb', '이터븀'),
+        71: ('Lu', '루테튬'), 72: ('Hf', '하프늄'), 73: ('Ta', '탄탈럼'), 74: ('W', '텅스텐'), 75: ('Re', '레늄'),
+        76: ('Os', '오스뮴'), 77: ('Ir', '이리듐'), 78: ('Pt', '백금'), 79: ('Au', '금'), 80: ('Hg', '수은'),
+        81: ('Tl', '탈륨'), 82: ('Pb', '납'), 83: ('Bi', '비스무트'), 84: ('Po', '폴로늄'), 85: ('At', '아스타틴'),
+        86: ('Rn', '라돈'), 87: ('Fr', '프랑슘'), 88: ('Ra', '라듐'), 89: ('Ac', '악티늄'), 90: ('Th', '토륨'),
+        91: ('Pa', '프로트악티늄'), 92: ('U', '우라늄'), 93: ('Np', '넵투늄'), 94: ('Pu', '플루토늄'), 95: ('Am', '아메리슘'),
+        96: ('Cm', '퀴리움'), 97: ('Bk', '버클륨'), 98: ('Cf', '캘리포늄'), 99: ('Es', '아인슈타이늄'), 100: ('Fm', '페르뮴'),
+        101: ('Md', '멘델레븀'), 102: ('No', '노벨륨'), 103: ('Lr', '로렌슘'), 104: ('Rf', '러더포듐'), 105: ('Db', '더브늄'),
+        106: ('Sg', '시보귬'), 107: ('Bh', '보륨'), 108: ('Hs', '하슘'), 109: ('Mt', '마이트너륨'), 110: ('Ds', '다름슈타튬'),
+        111: ('Rg', '뢴트게늄'), 112: ('Cn', '코페르니슘'), 113: ('Nh', '니호늄'), 114: ('Fl', '플레로븀'), 115: ('Mc', '모스코븀'),
+        116: ('Lv', '리버모륨'), 117: ('Ts', '테네신'), 118: ('Og', '오가네손')
+    }
+
+    # 교과서 핵심 원소 데이터 (실제 표준 환원 전위 및 속성)
+    core_data = {
+        1: (0.00, True, False, 1), 3: (-3.04, False, False, 1), 4: (-1.85, False, False, 2),
+        6: (0.20, True, False, 4), 7: (-0.01, True, False, 3), 8: (1.23, True, False, 2),
+        9: (2.87, True, False, 1), 11: (-2.71, False, False, 1), 12: (-2.37, False, False, 2),
+        13: (-1.66, False, False, 3), 17: (1.36, True, False, 1), 19: (-2.93, False, False, 1),
+        20: (-2.87, False, False, 2), 24: (-0.74, False, False, 3), 25: (-1.18, False, False, 2),
+        26: (-0.44, False, False, 2), 27: (-0.28, False, False, 2), 28: (-0.25, False, False, 2),
+        29: (0.34, False, False, 2), 30: (-0.76, False, False, 2), 35: (1.07, True, False, 1),
+        47: (0.80, False, False, 1), 50: (-0.14, False, False, 2), 53: (0.54, True, False, 1),
+        56: (-2.91, False, False, 2), 78: (1.18, False, False, 2), 79: (1.50, False, False, 3),
+        80: (0.85, False, False, 2), 82: (-0.13, False, False, 2)
+    }
+
+    all_data = []
     for i in range(1, 119):
-        if i not in existing_nums:
+        symbol, name = element_dict[i]
+        
+        if i in core_data:
+            potential, is_nonmetal, is_theo, ox_state = core_data[i]
+        else:
+            # 핵심 원소가 아닌 경우 임의의 전위값 생성 및 속성 판별
+            potential = round(0.5 - (i * 0.01), 2)
             is_theo = True if i >= 100 else False
-            is_nonmetal = True if i in [2, 10, 18, 36, 54, 86, 118] else False # 비활성기체 등
-            fake_potential = round(0.5 - (i * 0.01), 2) # 임의의 전위값 생성
-            missing_data.append((i, f"Elem{i}", f"원소{i}", fake_potential, is_nonmetal, is_theo, 2))
             
-    df_missing = pd.DataFrame(missing_data, columns=df.columns)
-    df_full = pd.concat([df, df_missing]).sort_values('원자번호').reset_index(drop=True)
+            # 비금속 및 비활성 기체 원자번호 목록 (대략적인 분류)
+            nonmetals = [1, 2, 5, 6, 7, 8, 9, 10, 14, 15, 16, 17, 18, 33, 34, 35, 36, 52, 53, 54, 85, 86, 117, 118]
+            is_nonmetal = True if i in nonmetals else False
+            ox_state = 2 # 기본 산화수 2로 통일 (가상 반응용)
+            
+        all_data.append((i, symbol, name, potential, is_nonmetal, is_theo, ox_state))
+
+    df_full = pd.DataFrame(all_data, columns=['원자번호', '기호', '한글이름', '표준환원전위', 'isNonMetal', 'isTheoretical', '산화수'])
     df_full['표시이름'] = df_full.apply(lambda x: f"{x['원자번호']:03d} - {x['한글이름']} ({x['기호']})", axis=1)
     return df_full
 
@@ -153,9 +167,9 @@ if "화학 전지" in mode:
     
     col1, col2 = st.columns(2)
     with col1:
-        elem1_str = st.selectbox("첫 번째 원소 선택", df['표시이름'].tolist(), index=29) # Zn
+        elem1_str = st.selectbox("첫 번째 원소 선택", df['표시이름'].tolist(), index=29) # Zn (아연, 30번, 인덱스 29)
     with col2:
-        elem2_str = st.selectbox("두 번째 원소 선택", df['표시이름'].tolist(), index=28) # Cu
+        elem2_str = st.selectbox("두 번째 원소 선택", df['표시이름'].tolist(), index=28) # Cu (구리, 29번, 인덱스 28)
         
     e1 = df[df['표시이름'] == elem1_str].iloc[0]
     e2 = df[df['표시이름'] == elem2_str].iloc[0]
@@ -204,10 +218,10 @@ else:
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("**(+)극 연결 원소 (산화 반응)**")
-        anode_str = st.selectbox("(+)극 선택", df['표시이름'].tolist(), index=18) # Cu
+        anode_str = st.selectbox("(+)극 선택", df['표시이름'].tolist(), index=28) # Cu
     with col2:
         st.markdown("**(-)극 연결 원소 (환원 반응)**")
-        cathode_str = st.selectbox("(-)극 선택", df['표시이름'].tolist(), index=21) # Ag
+        cathode_str = st.selectbox("(-)극 선택", df['표시이름'].tolist(), index=46) # Ag (은, 47번, 인덱스 46)
         
     anode = df[df['표시이름'] == anode_str].iloc[0]
     cathode = df[df['표시이름'] == cathode_str].iloc[0]
