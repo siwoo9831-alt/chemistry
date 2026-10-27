@@ -63,7 +63,6 @@ def load_element_data():
         all_data.append((i, symbol, name, potential, is_nonmetal, is_theo, ox_state))
 
     df_full = pd.DataFrame(all_data, columns=['원자번호', '기호', '한글이름', '표준환원전위', 'isNonMetal', 'isTheoretical', '산화수'])
-    # 검색을 용이하게 하기 위해 번호, 이름, 기호를 모두 포함
     df_full['표시이름'] = df_full.apply(lambda x: f"{x['원자번호']:03d} - {x['한글이름']} ({x['기호']})", axis=1)
     return df_full
 
@@ -154,10 +153,6 @@ if "화학 전지" in mode:
         sel2 = st.selectbox("환원극 전해질", [f"{cathode['기호']}(NO₃)₂ 수용액", f"{cathode['기호']}SO₄ 수용액", "기타"])
         sel3 = st.selectbox("염다리 물질", ["KNO₃", "KCl", "NH₄NO₃"])
         
-        st.markdown("---")
-        check_smart_exceptions(anode)
-        check_smart_exceptions(cathode)
-
     with right_col:
         st.subheader("📊 반응 결과 및 시각화")
         if e1['원자번호'] == e2['원자번호']:
@@ -170,6 +165,10 @@ if "화학 전지" in mode:
             m1.metric("(-) 산화극", f"{anode['기호']} (E°= {anode['표준환원전위']:.2f}V)")
             m2.metric("(+) 환원극", f"{cathode['기호']} (E°= {cathode['표준환원전위']:.2f}V)")
             m3.metric("표준 기전력", f"{e_cell:.2f} V", "자발적" if e_cell > 0 else "")
+            
+            # 여기서 예외 처리 경고문 출력! (반응 결과 수치 바로 밑)
+            check_smart_exceptions(anode)
+            check_smart_exceptions(cathode)
             
             draw_galvanic_cell(anode, cathode)
             
@@ -195,10 +194,6 @@ else:
         st.markdown("#### ⚗️ 전해질 통합 선택")
         st.selectbox("전해질 (수용액 또는 용융액)", [f"황산 구리({anode['기호']}SO₄) 수용액", f"염화 나트륨(NaCl) 용융액", "기타 수용액"])
         
-        st.markdown("---")
-        check_smart_exceptions(anode)
-        check_smart_exceptions(cathode)
-
     with right_col:
         st.subheader("📊 반응 결과 및 시각화")
         
@@ -209,6 +204,10 @@ else:
         m1.metric("(+) 산화극 (전원+)", f"{anode['기호']} ({anode['표준환원전위']:.2f}V)")
         m2.metric("(-) 환원극 (전원-)", f"{cathode['기호']} ({cathode['표준환원전위']:.2f}V)")
         m3.metric("이론적 최소 전압", f"{min_voltage:.2f} V", "비자발적" if e_cell_reverse < 0 else "자발적", delta_color="inverse")
+        
+        # 여기서 예외 처리 경고문 출력! (반응 결과 수치 바로 밑)
+        check_smart_exceptions(anode)
+        check_smart_exceptions(cathode)
         
         draw_electrolytic_cell(anode, cathode)
         
